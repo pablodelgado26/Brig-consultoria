@@ -1,25 +1,27 @@
-import { useState } from 'react';
-import { Dashboard } from './components/Dashboard';
-import { Sidebar } from './components/Sidebar';
-import { Faturamento } from './components/modules/Faturamento';
-import { LivroCaixa } from './components/modules/LivroCaixa';
-import { Pagamentos } from './components/modules/Pagamentos';
-import { Recebimentos } from './components/modules/Recebimentos';
-import { Estoque } from './components/modules/Estoque';
-import { Licitacao } from './components/modules/Licitacao';
-import { Pessoal } from './components/modules/Pessoal';
-import { Bens } from './components/modules/Bens';
-import { Precos } from './components/modules/Precos';
-import { Contratos } from './components/modules/Contratos';
-import { CadastroGeral } from './components/cadastros/CadastroGeral';
-import { CadastroTrabalhista } from './components/cadastros/CadastroTrabalhista';
-import { CadastroFiscal } from './components/cadastros/CadastroFiscal';
-import { CadastroAdministrativo } from './components/cadastros/CadastroAdministrativo';
-import { LancamentosFiscal } from './components/lancamentos/LancamentosFiscal';
-import { LancamentosTrabalhista } from './components/lancamentos/LancamentosTrabalhista';
-import { Relatorios } from './components/Relatorios';
+'use client'
 
-export default function App() {
+import { useState } from 'react';
+import { Dashboard } from '../src/components/Dashboard';
+import { Sidebar } from '../src/components/Sidebar';
+import { Faturamento } from '../src/components/modules/Faturamento';
+import { LivroCaixa } from '../src/components/modules/LivroCaixa';
+import { Pagamentos } from '../src/components/modules/Pagamentos';
+import { Recebimentos } from '../src/components/modules/Recebimentos';
+import { Estoque } from '../src/components/modules/Estoque';
+import { Licitacao } from '../src/components/modules/Licitacao';
+import { Pessoal } from '../src/components/modules/Pessoal';
+import { Bens } from '../src/components/modules/Bens';
+import { Precos } from '../src/components/modules/Precos';
+import { Contratos } from '../src/components/modules/Contratos';
+import { CadastroGeral } from '../src/components/cadastros/CadastroGeral';
+import { CadastroTrabalhista } from '../src/components/cadastros/CadastroTrabalhista';
+import { CadastroFiscal } from '../src/components/cadastros/CadastroFiscal';
+import { CadastroAdministrativo } from '../src/components/cadastros/CadastroAdministrativo';
+import { LancamentosFiscal } from '../src/components/lancamentos/LancamentosFiscal';
+import { LancamentosTrabalhista } from '../src/components/lancamentos/LancamentosTrabalhista';
+import { Relatorios } from '../src/components/Relatorios';
+
+export default function Home() {
   const [activeModule, setActiveModule] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
