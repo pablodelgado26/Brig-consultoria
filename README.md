@@ -1,49 +1,76 @@
+# Brig - Sistema de Gestão MEI
+
+Sistema completo de gestão para Microempreendedor Individual (MEI) desenvolvido em React + JavaScript + Vite.
+
+## 🚀 Funcionalidades
+
+### Controles
+- **Faturamento** - Controle de faturamento mensal com declarações
+- **Livro Caixa** - Controle de entradas e saídas
+- **Pagamentos** - Gestão de contas a pagar
+- **Recebimentos** - Gestão de contas a receber
+- **Estoque** - Controle de produtos e estoque
+- **Licitação** - Gestão de documentos para licitação
+- **Pessoal** - Controle de funcionários e E-social
+- **Bens** - Controle de patrimônio
+- **Preços** - Gestão de preços e margens
+- **Contratos** - Controle de contratos
+
+### Cadastros
+- **Cadastro Geral** - Dados da empresa, responsável, fornecedores e clientes
+- **Cadastro Trabalhista** - Funcionários, horários e calendário
+- **Cadastro Fiscal** - Produtos, unidades e natureza de operação
+- **Cadastro Administrativo** - Documentos e categorias financeiras
+
+### Lançamentos
+- **Lançamentos Fiscal** - Notas fiscais de entrada e saída
+- **Lançamentos Trabalhista** - Folha de pagamento, férias e eventos
+
+### Relatórios
+- Relatórios Fiscais
+- Relatórios Trabalhistas
+- Relatórios Financeiros
+
+## 🛠️ Tecnologias
+
+- React 18.3
+- Vite 6.3
+- Tailwind CSS
+- Radix UI Components
+- Lucide React Icons
+- React Hook Form
+- Recharts
+
 ## 📋 Pré-requisitos
 
-Antes de começar, certifique-se de ter instalado em sua máquina:
-
 - **Node.js** (versão 18.x ou superior)
-- **npm** ou **yarn** (gerenciador de pacotes)
-- **Git** (para clonar o repositório)
+- **npm** (gerenciador de pacotes)
 
 ## 🚀 Instalação
-
-Siga os passos abaixo para configurar o projeto localmente:
 
 ### 1. Clone o repositório
 
 ```bash
-git clone https://github.com/pablodelgado26/estrutura-React.git
+git clone https://github.com/pablodelgado26/Brig-consultoria.git
+cd brig
 ```
 
-### 2. Navegue até o diretório do projeto
+### 2. Instale as dependências
 
-```bash
-cd estrutura-React
-```
-
-### 3. Instale as dependências
-
-Usando npm:
 ```bash
 npm install
 ```
 
-Ou usando yarn:
-```bash
-yarn install
-```
+### 3. Execute em modo de desenvolvimento
 
-### 4. Execute o projeto em modo de desenvolvimento
-
-Usando npm:
 ```bash
 npm run dev
 ```
 
-Ou usando yarn:
+### 4. Build para produção
+
 ```bash
-yarn dev
+npm run build
 ```
 
 ### 5. Acesse a aplicação
