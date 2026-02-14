@@ -3,29 +3,74 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
-import { Plus, Search, FileText, Download } from 'lucide-react';
+import { Plus, Search, FileText, Download, Loader2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { useFaturamento } from '../../hooks/useApi';
 
 export function Faturamento() {
-  const [faturamentos, setFaturamentos] = useState([
-    { id: '1', mes: 'Outubro', ano: '2025', receitaBruta: 28500, despesas: 5200, receitaLiquida: 23300, status: 'Declarado' },
-    { id: '2', mes: 'Setembro', ano: '2025', receitaBruta: 25480, despesas: 4800, receitaLiquida: 20680, status: 'Declarado' },
-    { id: '3', mes: 'Agosto', ano: '2025', receitaBruta: 22100, despesas: 4500, receitaLiquida: 17600, status: 'Declarado' },
-    { id: '4', mes: 'Julho', ano: '2025', receitaBruta: 26800, despesas: 5100, receitaLiquida: 21700, status: 'Declarado' },
-  ]);
-
+  const { items: faturamentos, loading, error, create, update, delete: deleteItem, statistics } = useFaturamento();
   const [searchTerm, setSearchTerm] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    mes: '',
+    ano: new Date().getFullYear().toString(),
+    receitaBruta: '',
+    despesas: '',
+    receitaLiquida: ''
+  });
 
   const filteredFaturamentos = faturamentos.filter(fat =>
-    fat.mes.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    fat.ano.includes(searchTerm)
+    fat.mes?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    fat.ano?.toString().includes(searchTerm)
   );
 
-  const totalReceitaBruta = faturamentos.reduce((sum, fat) => sum + fat.receitaBruta, 0);
-  const totalDespesas = faturamentos.reduce((sum, fat) => sum + fat.despesas, 0);
-  const totalReceitaLiquida = faturamentos.reduce((sum, fat) => sum + fat.receitaLiquida, 0);
+  const totalReceitaBruta = faturamentos.reduce((sum, fat) => sum + (parseFloat(fat.receitaBruta) || 0), 0);
+  const totalDespesas = faturamentos.reduce((sum, fat) => sum + (parseFloat(fat.despesas) || 0), 0);
+  const totalReceitaLiquida = faturamentos.reduce((sum, fat) => sum + (parseFloat(fat.receitaLiquida) || 0), 0);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const data = {
+        ...formData,
+        receitaBruta: parseFloat(formData.receitaBruta) || 0,
+        despesas: parseFloat(formData.despesas) || 0,
+        receitaLiquida: (parseFloat(formData.receitaBruta) || 0) - (parseFloat(formData.despesas) || 0)
+      };
+      
+      await create(data);
+      setIsDialogOpen(false);
+      setFormData({
+        mes: '',
+        ano: new Date().getFullYear().toString(),
+        receitaBruta: '',
+        despesas: '',
+        receitaLiquida: ''
+      });
+    } catch (error) {
+      console.error('Erro ao criar faturamento:', error);
+      alert('Erro ao salvar faturamento. Verifique os dados e tente novamente.');
+    }
+  };
+
+  const handleInputChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleDelete = async (id) => {
+    if (confirm('Tem certeza que deseja excluir este faturamento?')) {
+      try {
+        await deleteItem(id);
+      } catch (error) {
+        console.error('Erro ao excluir faturamento:', error);
+        alert('Erro ao excluir faturamento.');
+      }
+    }
+  };
 
   return (
     <div className="p-6">

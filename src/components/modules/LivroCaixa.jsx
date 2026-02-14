@@ -3,38 +3,92 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
-import { Plus, Search, ArrowUpCircle, ArrowDownCircle, Calendar } from 'lucide-react';
+import { Plus, Search, ArrowUpCircle, ArrowDownCircle, Calendar, Loader2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { useLivroCaixa } from '../../hooks/useApi';
 
 export function LivroCaixa() {
-  const [lancamentos, setLancamentos] = useState([
-    { id: '1', data: '2025-11-15', tipo: 'Entrada', descricao: 'Venda - Cliente ABC', categoria: 'Receita', valor: 1500, formaPagamento: 'PIX' },
-    { id: '2', data: '2025-11-14', tipo: 'Saída', descricao: 'Compra de material', categoria: 'Despesa Operacional', valor: 850, formaPagamento: 'Débito' },
-    { id: '3', data: '2025-11-14', tipo: 'Entrada', descricao: 'Venda - Cliente XYZ', categoria: 'Receita', valor: 2300, formaPagamento: 'Crédito' },
-    { id: '4', data: '2025-11-13', tipo: 'Saída', descricao: 'Pagamento fornecedor', categoria: 'Despesa Operacional', valor: 1200, formaPagamento: 'Transferência' },
-    { id: '5', data: '2025-11-12', tipo: 'Entrada', descricao: 'Prestação de serviço', categoria: 'Receita', valor: 3500, formaPagamento: 'PIX' },
-  ]);
+  const { 
+    items: lancamentos, 
+    loading, 
+    error, 
+    create, 
+    update, 
+    delete: deleteItem, 
+    totals,
+    resumoCategoria 
+  } = useLivroCaixa();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [tipoLancamento, setTipoLancamento] = useState('Entrada');
+  const [formData, setFormData] = useState({
+    tipo: 'Entrada',
+    descricao: '',
+    categoria: '',
+    valor: '',
+    formaPagamento: '',
+    data: new Date().toISOString().split('T')[0]
+  });
 
   const filteredLancamentos = lancamentos.filter(lanc =>
-    lanc.descricao.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    lanc.categoria.toLowerCase().includes(searchTerm.toLowerCase())
+    lanc.descricao?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    lanc.categoria?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const totalEntradas = lancamentos
+  // Usa dados da API ou calcula localmente como fallback
+  const totalEntradas = totals?.entradas || lancamentos
     .filter(l => l.tipo === 'Entrada')
-    .reduce((sum, l) => sum + l.valor, 0);
+    .reduce((sum, l) => sum + (parseFloat(l.valor) || 0), 0);
   
-  const totalSaidas = lancamentos
+  const totalSaidas = totals?.saidas || lancamentos
     .filter(l => l.tipo === 'Saída')
-    .reduce((sum, l) => sum + l.valor, 0);
+    .reduce((sum, l) => sum + (parseFloat(l.valor) || 0), 0);
   
-  const saldo = totalEntradas - totalSaidas;
+  const saldo = totals?.saldo || (totalEntradas - totalSaidas);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const data = {
+        ...formData,
+        valor: parseFloat(formData.valor) || 0
+      };
+      
+      await create(data);
+      setIsDialogOpen(false);
+      setFormData({
+        tipo: 'Entrada',
+        descricao: '',
+        categoria: '',
+        valor: '',
+        formaPagamento: '',
+        data: new Date().toISOString().split('T')[0]
+      });
+    } catch (error) {
+      console.error('Erro ao criar lançamento:', error);
+      alert('Erro ao salvar lançamento. Verifique os dados e tente novamente.');
+    }
+  };
+
+  const handleInputChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleDelete = async (id) => {
+    if (confirm('Tem certeza que deseja excluir este lançamento?')) {
+      try {
+        await deleteItem(id);
+      } catch (error) {
+        console.error('Erro ao excluir lançamento:', error);
+        alert('Erro ao excluir lançamento.');
+      }
+    }
+  };
 
   return (
     <div className="p-6">

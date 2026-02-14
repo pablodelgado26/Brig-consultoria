@@ -7,44 +7,60 @@ import {
   Package,
   TrendingUp,
   TrendingDown,
-  DollarSign
+  DollarSign,
+  Loader2,
+  Wifi,
+  WifiOff
 } from 'lucide-react';
+import { useDashboardData, useConnectionTest } from '../hooks/useApi';
+import { ResumoMensalWidget } from './widgets/ResumoMensalWidget';
 
 export function Dashboard({ onNavigate }) {
-  const stats = [
+  const { stats: apiStats, loading, error, refetch } = useDashboardData();
+  const { connected, testing, retry } = useConnectionTest();
+
+  // Dados de fallback enquanto carrega ou em caso de erro
+  const defaultStats = [
     { 
       title: 'Faturamento Mensal', 
-      value: 'R$ 25.480,00', 
+      value: 'R$ 0,00', 
       icon: DollarSign, 
-      change: '+12.5%',
-      trend: 'up',
+      change: '0%',
+      trend: 'neutral',
       onClick: () => onNavigate('faturamento')
     },
     { 
       title: 'Contas a Receber', 
-      value: 'R$ 8.500,00', 
+      value: 'R$ 0,00', 
       icon: ArrowDownCircle, 
-      change: '5 pendentes',
+      change: '0 pendentes',
       trend: 'neutral',
       onClick: () => onNavigate('recebimentos')
     },
     { 
       title: 'Contas a Pagar', 
-      value: 'R$ 3.200,00', 
+      value: 'R$ 0,00', 
       icon: CreditCard, 
-      change: '3 vencendo',
-      trend: 'down',
+      change: '0 vencendo',
+      trend: 'neutral',
       onClick: () => onNavigate('pagamentos')
     },
     { 
       title: 'Produtos em Estoque', 
-      value: '248', 
+      value: '0', 
       icon: Package, 
-      change: '12 itens baixos',
+      change: '0 itens baixos',
       trend: 'neutral',
       onClick: () => onNavigate('estoque')
     },
   ];
+
+  // Combina dados da API com configurações visuais
+  const stats = apiStats?.stats ? apiStats.stats.map((apiStat, index) => ({
+    ...apiStat,
+    icon: defaultStats[index]?.icon || DollarSign,
+    onClick: defaultStats[index]?.onClick
+  })) : defaultStats;
 
   const quickAccess = [
     { 
@@ -67,18 +83,67 @@ export function Dashboard({ onNavigate }) {
     },
   ];
 
-  const recentActivity = [
-    { type: 'Recebimento', description: 'Cliente ABC Ltda - NF 1234', value: 'R$ 1.500,00', date: '15/11/2025' },
-    { type: 'Pagamento', description: 'Fornecedor XYZ - Fatura 567', value: 'R$ 850,00', date: '14/11/2025' },
-    { type: 'Nota Fiscal', description: 'NF-e 8901 emitida', value: 'R$ 2.300,00', date: '14/11/2025' },
-    { type: 'Estoque', description: 'Entrada de mercadoria - NF 4567', value: '45 itens', date: '13/11/2025' },
-  ];
+  // Usa atividades da API ou dados de fallback
+  const recentActivity = apiStats?.recentActivities?.length > 0 
+    ? apiStats.recentActivities 
+    : [
+        { 
+          type: connected ? 'Sistema' : 'Conexão', 
+          description: connected ? 'Sistema conectado ao backend' : 'Tentando conectar ao servidor...', 
+          value: connected ? '✓' : '⚠', 
+          date: new Date().toLocaleDateString('pt-BR') 
+        }
+      ];
 
   return (
     <div className="p-6">
-      <div className="mb-8">
-        <h1 className="text-3xl mb-2">Dashboard</h1>
-        <p className="text-gray-600">Visão geral do seu negócio MEI</p>
+      <div className="mb-8 flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl mb-2">Dashboard</h1>
+          <p className="text-gray-600">Visão geral do seu negócio MEI</p>
+        </div>
+        <div className="flex items-center gap-4">
+          {/* Status da conexão */}
+          <div className="flex items-center gap-2">
+            {connected ? (
+              <Wifi className="h-4 w-4 text-green-500" />
+            ) : (
+              <WifiOff className="h-4 w-4 text-red-500" />
+            )}
+            <span className={`text-sm ${connected ? 'text-green-600' : 'text-red-500'}`}>
+              {testing ? 'Verificando...' : connected ? 'Conectado' : 'Desconectado'}
+            </span>
+          </div>
+
+          {/* Botões de ação */}
+          {loading && (
+            <div className="flex items-center gap-2 text-blue-600">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="text-sm">Carregando...</span>
+            </div>
+          )}
+          
+          {error && !connected && (
+            <button 
+              onClick={() => {
+                retry();
+                refetch();
+              }}
+              className="px-3 py-1 bg-red-100 text-red-600 rounded text-sm hover:bg-red-200 transition-colors"
+            >
+              Reconectar
+            </button>
+          )}
+          
+          {connected && (
+            <button 
+              onClick={refetch}
+              className="px-3 py-1 bg-blue-100 text-blue-600 rounded text-sm hover:bg-blue-200 transition-colors"
+            >
+              Atualizar
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Stats Grid */}
@@ -162,6 +227,18 @@ export function Dashboard({ onNavigate }) {
               </div>
             </CardContent>
           </Card>
+        </div>
+      </div>
+
+      {/* Resumo Mensal Widget */}
+      <div className="mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-1">
+            <ResumoMensalWidget />
+          </div>
+          <div className="lg:col-span-2">
+            {/* Espaço para futuros widgets */}
+          </div>
         </div>
       </div>
 

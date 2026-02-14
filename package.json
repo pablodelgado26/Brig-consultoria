@@ -50,13 +50,14 @@
     "recharts": "^2.15.2",
     "sonner": "^2.0.3",
     "tailwind-merge": "*",
+    "tslib": "^2.8.1",
     "vaul": "^1.1.2"
   },
   "devDependencies": {
-    "next": "^15.1.6",
+    "autoprefixer": "^10.4.20",
     "eslint": "^8.57.0",
     "eslint-config-next": "^15.1.6",
-    "autoprefixer": "^10.4.20",
+    "next": "^15.1.6",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.1"
   }
